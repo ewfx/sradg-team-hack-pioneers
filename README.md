@@ -1,60 +1,114 @@
-# 🚀 Project Name
+# Anomaly Detection in Reconciliation Data
 
-## 📌 Table of Contents
-- [Introduction](#introduction)
-- [Demo](#demo)
-- [Inspiration](#inspiration)
-- [What It Does](#what-it-does)
-- [How We Built It](#how-we-built-it)
-- [Challenges We Faced](#challenges-we-faced)
-- [How to Run](#how-to-run)
-- [Tech Stack](#tech-stack)
-- [Team](#team)
+## Overview
 
----
+This project is an anomaly detection system for reconciliation data using machine learning and OpenAI's GPT models. It processes uploaded datasets, detects anomalies, and provides a summarized resolution of identified anomalies.
 
-## 🎯 Introduction
-A brief overview of your project and its purpose. Mention which problem statement are your attempting to solve. Keep it concise and engaging.
+## Features
 
-## 🎥 Demo
-🔗 [Live Demo](#) (if applicable)  
-📹 [Video Demo](#) (if applicable)  
-🖼️ Screenshots:
+- Detect anomalies using Isolation Forest
+- Provide comments for each anomaly from the dataset
+- Summarize break resolutions using OpenAI
+- Flask-based API endpoints for easy integration
 
-![Screenshot 1](link-to-image)
+## Installation
 
-## 💡 Inspiration
-What inspired you to create this project? Describe the problem you're solving.
+### Prerequisites
 
-## ⚙️ What It Does
-Explain the key features and functionalities of your project.
+- Python 3.8+
+- pip
 
-## 🛠️ How We Built It
-Briefly outline the technologies, frameworks, and tools used in development.
+### Setup Instructions
 
-## 🚧 Challenges We Faced
-Describe the major technical or non-technical challenges your team encountered.
-
-## 🏃 How to Run
-1. Clone the repository  
+1. Clone the repository:
+2. Create a virtual environment and activate it:
    ```sh
-   git clone https://github.com/your-repo.git
+   python -m venv venv
+   source venv/bin/activate  # On Windows use: venv\Scripts\activate
    ```
-2. Install dependencies  
-   ```sh
-   npm install  # or pip install -r requirements.txt (for Python)
-   ```
-3. Run the project  
-   ```sh
-   npm start  # or python app.py
-   ```
+3. Install dependencies:  
+   pandas,scikit-learn,openai,python-dotenv,werkzeug
 
-## 🏗️ Tech Stack
-- 🔹 Frontend: React / Vue / Angular
-- 🔹 Backend: Node.js / FastAPI / Django
-- 🔹 Database: PostgreSQL / Firebase
-- 🔹 Other: OpenAI API / Twilio / Stripe
+## Usage
 
-## 👥 Team
-- **Your Name** - [GitHub](#) | [LinkedIn](#)
-- **Teammate 2** - [GitHub](#) | [LinkedIn](#)
+### Running the Flask Server
+
+```sh
+python app.py
+```
+
+The server will start at `http://127.0.0.1:5000/`
+
+### API Endpoints
+
+#### 1. Detect Anomalies
+
+- **Endpoint:** `/detect_anomalies`
+- **Method:** `POST`
+- **Request:**
+  - `file`: CSV or Excel file containing transaction data.
+  - `config`: JSON object specifying key columns (e.g.,
+    {
+    "key_columns": ["Transaction_ID"],
+    "criteria_columns": ["Amount"],
+    "date_columns": ["Transaction_Date"],
+    "comments_column": "Comments"
+    }).
+- **Response:**
+  ```json
+  {
+    "anomalies": [
+      {
+        "TransactionID": "TXN832",
+        "is_anomaly": "Normal",
+        "Comments": "Duplicate transaction"
+      },
+      {
+        "TransactionID": "TXN841",
+        "is_anomaly": "Normal",
+        "Comments": "Duplicate transaction"
+      },
+      {
+        "TransactionID": "TXN777",
+        "is_anomaly": "Anomaly",
+        "Comments": "No Anomaly"
+      }
+    ]
+  }
+  ```
+
+#### 2. Summarize Break Resolutions
+
+- **Endpoint:** `/summarize_resolutions`
+- **Method:** `POST`
+- **Request:**
+  - JSON object containing a list of anomalies with their comments.
+    eg.
+    {
+    "anomalies": [
+    {
+    "Comments": "No Anomaly",
+    "TransactionID": "TXN1127",
+    "is_anomaly": "Normal"
+    },
+    {
+    "Comments": "Delayed settlement due to bank issue",
+    "TransactionID": "TXN1438",
+    "is_anomaly": "Anomaly"
+    }]
+    }
+- **Response:**
+  ```json
+  {
+    "summary": [
+      {
+        "comments": "Delayed settlement due to bank issue",
+        "summary": "OPENAI response"
+      },
+      {
+        "comments": "Incorrect transaction amount",
+        "summary": "OPENAI response"
+      }
+    ]
+  }
+  ```
